@@ -5,5 +5,7 @@ node_modules/
 *.pyo
 *.pyd
 *.sqlite3
+dist/
 .env
+*.log
 
