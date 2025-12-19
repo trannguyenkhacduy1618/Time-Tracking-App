@@ -36,7 +36,7 @@ class User(Base):
 
     boards = relationship("Board", back_populates="owner")
     tasks = relationship("Task", back_populates="assigned_user")
-    time_entries = relationship("TimeTracking", back_populates="user")
+    time_entries = relationship("TimeEntry", back_populates="user")
 
 # ====================
 # BOARD
@@ -75,7 +75,7 @@ class Task(Base):
 
     board = relationship("Board", back_populates="tasks")
     assigned_user = relationship("User", back_populates="tasks")
-    time_entries = relationship("TimeTracking", back_populates="task")
+    time_entries = relationship("TimeEntry", back_populates="task")
 
 # ====================
 # TIME TRACKING
