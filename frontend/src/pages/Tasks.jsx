@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import TaskCard from "./TaskCard";
+import TaskCard from "../components/TaskCard";
 import "../styles/task.css";
 
 const Tasks = ({ onSelectTask }) => {
