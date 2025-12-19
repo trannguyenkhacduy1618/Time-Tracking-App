@@ -6,7 +6,7 @@ class Settings(BaseSettings):
 
     # JWT
     SECRET_KEY: str
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60  # 1 giờ
+    access_token_expire_minutes: int = 60  # 1 giờ
 
     # App settings
     APP_NAME: str = "Time Tracking App"
