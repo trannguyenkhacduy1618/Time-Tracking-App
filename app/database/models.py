@@ -31,8 +31,8 @@ class User(Base):
     password_hash = Column(String(255), nullable=False)
     role = Column(String(10), default="user")
     is_active = Column(Boolean, default=True)
-    created_at = Column(DateTime, nullable=False)
-    updated_at = Column(DateTime, nullable=False)
+    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+    updated_at = Column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     boards = relationship("Board", back_populates="owner")
     tasks = relationship("Task", back_populates="assigned_user")
