@@ -32,19 +32,15 @@ const login = async (username, password) => {
 /**
  *register
  */
-const register = async (username, password) => {
-  const response = await api.post(
-    "/auth/register",
-    new URLSearchParams({
-      username,
-      password,
-    }),
-    {
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-    }
-  );
+const register = async (data) => {
+  const response = await api.post("/auth/register", {
+    username: data.username,
+    email: data.email,
+    full_name: data.full_name,
+    password: data.password,
+    role: "user",
+    is_active: true,
+});
 
   return response.data;
 };
