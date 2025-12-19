@@ -15,8 +15,8 @@ origins = [
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://web-4aufj11uj-duysps-projects.vercel.app"],
-    allow_credentials=True,
+    allow_origins=["*"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
