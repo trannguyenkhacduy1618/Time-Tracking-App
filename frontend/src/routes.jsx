@@ -4,9 +4,12 @@ import Tasks from "./pages/Tasks";
 import TimeTracking from "./pages/TimeTracking";
 import Reports from "./pages/Reports";
 import Login from "./pages/Login";
+import Register from "./pages/Register";
 import authService from "./services/authService";
 
+
 /**
+ *
  * Route bảo vệ (yêu cầu đăng nhập)
  */
 const PrivateRoute = ({ children }) => {
@@ -17,10 +20,16 @@ const PrivateRoute = ({ children }) => {
  * Khai báo toàn bộ routes
  */
 const routes = [
-    {
-        path: "/login",
-        element: <Login />,
-    },
+{
+    path: "/login",
+    element: <Login />,
+},
+
+{
+    path:"register",
+    element: <Register />
+},
+
 {
     path: "/",
     element: (
@@ -29,6 +38,7 @@ const routes = [
         </PrivateRoute>
     ),
 },
+
 {
     path: "/tasks",
     element: (
