@@ -4,7 +4,7 @@ import TaskCard from "../components/TaskCard";
 import ReportTable from "../components/ReportTable";
 import Statistics from "../components/Statistics";
 import axios from "axios";
-import "../Dashboard.css";
+import "../styles/dashboard.css";
 
 // Section wrapper với scroll nếu nội dung dài
 const Section = ({ title, children }) => (
