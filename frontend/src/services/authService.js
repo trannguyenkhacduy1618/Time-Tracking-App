@@ -1,7 +1,8 @@
 import api from "./api";
 
 const USER_KEY = "current_user";
-const TOKEN_KEY = import.meta.env.VITE_AUTH_TOKEN_KEY || "access_token";
+const API_URL = import.meta.env.VITE_API_URL;
+const TOKEN_KEY = import.meta.env.VITE_AUTH_TOKEN_KEY;
 
 /**
  * Login
@@ -33,14 +34,15 @@ const login = async (username, password) => {
  *register
  */
 const register = async (data) => {
-  const response = await api.post("/auth/register", {
+  return api.post("/auth/register", {
     username: data.username,
     email: data.email,
     full_name: data.full_name,
     password: data.password,
     role: "user",
     is_active: true,
-});
+  });
+};
 
   return response.data;
 };
