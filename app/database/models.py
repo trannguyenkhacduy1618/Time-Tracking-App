@@ -80,8 +80,8 @@ class Task(Base):
 # ====================
 # TIME TRACKING
 # ====================
-class TimeTracking(Base):
-    __tablename__ = "TimeEntry"
+class TimeEntry(Base):
+    __tablename__ = "time_tracking"
 
     id = Column(Integer, primary_key=True, index=True)
     task_id = Column(Integer, ForeignKey("tasks.id"))
