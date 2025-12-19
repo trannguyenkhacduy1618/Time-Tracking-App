@@ -17,7 +17,7 @@ class UserRepository:
         return db.query(User).offset(skip).limit(limit).all()
 
     def create_user(self, db: Session, obj_in: dict) -> User:
-        user = User(**bj_in)
+        user = User(**obj_in)
         db.add(user)
         db.commit()
         db.refresh(user)
