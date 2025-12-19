@@ -1,67 +1,52 @@
-import React, { useState, useEffect, useRef } from "react";
-import axios from "axios";
+import { useState, useEffect, useRef } from "react";
+import timeService from "../services/timeService";
 
 const TimeTracking = ({ taskId, onStop }) => {
-  const [isRunning, setIsRunning] = useState(false);
-  const [elapsed, setElapsed] = useState(0); // thời gian tính bằng giây
+  const [runningEntry, setRunningEntry] = useState(null);
+  const [elapsed, setElapsed] = useState(0);
   const intervalRef = useRef(null);
 
   useEffect(() => {
-    if (isRunning) {
-      intervalRef.current = setInterval(() => {
-        setElapsed((prev) => prev + 1);
-      }, 1000);
-    } else {
-      clearInterval(intervalRef.current);
-    }
+    const fetchRunning = async () => {
+      const entry = await timeService.getRunningEntry();
+      if (entry && entry.task_id === taskId) {
+        setRunningEntry(entry);
+        setElapsed(entry.elapsed_seconds);
+      }
+    };
+    fetchRunning();
+  }, [taskId]);
 
+  useEffect(() => {
+    if (!runningEntry) return;
+    intervalRef.current = setInterval(() => {
+      setElapsed((prev) => prev + 1);
+    }, 1000);
     return () => clearInterval(intervalRef.current);
-  }, [isRunning]);
+  }, [runningEntry]);
 
-  const handleStart = () => setIsRunning(true);
-  const handlePause = () => setIsRunning(false);
+  const handleStart = async () => {
+    const entry = await timeService.startTimer(taskId);
+    setRunningEntry(entry);
+    setElapsed(0);
+  };
 
   const handleStop = async () => {
-    setIsRunning(false);
-    try {
-      await axios.post("/api/time_tracking/", {
-        task_id: taskId,
-        duration_seconds: elapsed,
-      });
-      setElapsed(0);
-      if (onStop) onStop(); // callback parent
-    } catch (error) {
-      console.error("Error saving time entry:", error);
-    }
+    if (!runningEntry) return;
+    await timeService.stopTimer(runningEntry.id);
+    setRunningEntry(null);
+    setElapsed(0);
+    if (onStop) onStop();
   };
 
-  const formatTime = (seconds) => {
-    const h = Math.floor(seconds / 3600)
-      .toString()
-      .padStart(2, "0");
-    const m = Math.floor((seconds % 3600) / 60)
-      .toString()
-      .padStart(2, "0");
-    const s = (seconds % 60).toString().padStart(2, "0");
-    return `${h}:${m}:${s}`;
-  };
-
-  return (
-    <div className="time-tracking">
-      <h3>Task ID: {taskId}</h3>
-      <p>Elapsed: {formatTime(elapsed)}</p>
-      <div className="controls">
-        {!isRunning ? (
-          <button onClick={handleStart}>Start</button>
-        ) : (
-          <button onClick={handlePause}>Pause</button>
-        )}
-        <button onClick={handleStop} disabled={elapsed === 0}>
-          Stop & Save
-        </button>
+    return (
+      <div className="time-tracking">
+      <p>Elapsed: {Math.floor(elapsed / 3600)}:{Math.floor((elapsed % 3600)/60)}:{elapsed % 60}</p>
+      {!runningEntry ? (
+        <button onClick={handleStart}>Start</button>
+      ) : (
+        <button onClick={handleStop}>Stop</button>
+      )}
       </div>
-    </div>
-  );
+    );
 };
-
-export default TimeTracking;
