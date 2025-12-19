@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
 from typing import List, Optional
+from app.core.security import get_password_hash
 from app.database.models import User
 
 class UserRepository:
@@ -15,7 +16,7 @@ class UserRepository:
     def get_multi(self, db: Session, skip: int = 0, limit: int = 100) -> List[User]:
         return db.query(User).offset(skip).limit(limit).all()
 
-    def create_user(self, db: Session, user_dict: dict) -> User:
+    def create_user(self, db: Session, obj_in: dict) -> User:
         user = User(**user_dict)
         db.add(user)
         db.commit()
@@ -29,8 +30,8 @@ class UserRepository:
         db.refresh(db_obj)
         return db_obj
 
-    def update_password(self, db: Session, user: User, new_password_hash: str):
-        user.password_hash = new_password_hash
+    def update_password(self, db: Session, user: User, new_password: str):
+        user.password_hash = get_password_hash(new_password)
         db.commit()
         db.refresh(user)
         return user
@@ -40,5 +41,4 @@ class UserRepository:
         db.commit()
 
 
-# Singleton instance để import dễ dàng
 user_repository = UserRepository()
