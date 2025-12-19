@@ -1,4 +1,5 @@
 import api from "./api";
+
 const USER_KEY = "current_user";
 const TOKEN_KEY = import.meta.env.VITE_AUTH_TOKEN_KEY;
 
@@ -32,7 +33,7 @@ const login = async (username, password) => {
  *register
  */
 const register = async (data) => {
-  return axios.post(`${API_URL}/auth/register`, {
+  return api.post("/auth/register", {
     username: data.username,
     email: data.email,
     full_name: data.full_name,
