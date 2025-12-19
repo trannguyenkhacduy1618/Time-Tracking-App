@@ -1,4 +1,5 @@
-import api from "./api";
+// frontend/src/services/authService.js
+import api from "../api";
 
 const USER_KEY = "current_user";
 const TOKEN_KEY = import.meta.env.VITE_AUTH_TOKEN_KEY || "access_token";
@@ -9,14 +10,9 @@ const TOKEN_KEY = import.meta.env.VITE_AUTH_TOKEN_KEY || "access_token";
 const login = async (username, password) => {
   const response = await api.post(
     "/auth/login",
-    new URLSearchParams({
-      username,
-      password,
-    }),
+    new URLSearchParams({ username, password }),
     {
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
     }
   );
 
@@ -40,9 +36,7 @@ const logout = () => {
 /**
  * Lấy token hiện tại
  */
-const getToken = () => {
-  return localStorage.getItem(TOKEN_KEY);
-};
+const getToken = () => localStorage.getItem(TOKEN_KEY);
 
 /**
  * Lấy user hiện tại
@@ -55,9 +49,7 @@ const getCurrentUser = () => {
 /**
  * Kiểm tra đã login chưa
  */
-const isAuthenticated = () => {
-  return !!getToken();
-};
+const isAuthenticated = () => !!getToken();
 
 export default {
   login,
