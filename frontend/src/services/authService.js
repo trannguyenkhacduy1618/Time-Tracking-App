@@ -22,7 +22,6 @@ const login = async (username, password) => {
 
   const { access_token, user } = response.data;
 
-  // Lưu token & user
   localStorage.setItem(TOKEN_KEY, access_token);
   localStorage.setItem(USER_KEY, JSON.stringify(user));
 
@@ -30,18 +29,25 @@ const login = async (username, password) => {
 };
 
 /**
- *register
+ * Register
  */
-const register = async (data) => {
-  return api.post("/auth/register", {
-    username: data.username,
-    email: data.email,
-    full_name: data.full_name,
-    password: data.password,
-    role: "user",
-    is_active: true,
-  });
-};
+const register = async ({
+  username,
+  email,
+  full_name,
+  password,
+}) => {
+  const response = await api.post(
+    "/auth/register",
+    {
+      username,
+      email,
+      full_name,
+      password,
+      role: "user",
+      is_active: true,
+    }
+  );
 
   return response.data;
 };
@@ -54,27 +60,14 @@ const logout = () => {
   localStorage.removeItem(USER_KEY);
 };
 
-/**
- * Lấy token hiện tại
- */
-const getToken = () => {
-  return localStorage.getItem(TOKEN_KEY);
-};
+const getToken = () => localStorage.getItem(TOKEN_KEY);
 
-/**
- * Lấy user hiện tại
- */
 const getCurrentUser = () => {
   const user = localStorage.getItem(USER_KEY);
   return user ? JSON.parse(user) : null;
 };
 
-/**
- * Kiểm tra đã login chưa
- */
-const isAuthenticated = () => {
-  return !!getToken();
-};
+const isAuthenticated = () => !!getToken();
 
 export default {
   login,
