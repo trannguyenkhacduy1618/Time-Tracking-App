@@ -11,7 +11,7 @@ from app.core.security import (
 from app.core.config import settings
 from app.core.deps import get_db
 from app.schemas.user import UserCreate, UserResponse, UserLogin
-from app.database import user_repository
+from app.database.user_repository import user_repository
 
 router = APIRouter(prefix="/auth", tags=["authentication"])
 
