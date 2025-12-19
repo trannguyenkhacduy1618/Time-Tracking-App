@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.api import auth, users, boards, tasks, time_tracking, reports
+from app.database.connection import init_app
 
 app = FastAPI(
     title="Time Tracking App",
@@ -38,3 +39,5 @@ app.include_router(reports.router)
 @app.get("/", tags=["root"])
 def root():
     return {"message": "Welcome to the Time Tracking App"}
+
+init_app(app)
