@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import Stopwatch from "./Stopwatch";
-import TaskCard from "./TaskCard";
-import ReportTable from "./ReportTable";
+import Stopwatch from "../components/Stopwatch";
+import TaskCard from "../components/TaskCard";
+import ReportTable from "../components/ReportTable";
 import Statistics from "./Statistics";
 import axios from "axios";
 
