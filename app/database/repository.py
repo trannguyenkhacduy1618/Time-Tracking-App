@@ -3,7 +3,7 @@ from sqlalchemy import func
 from typing import List, Optional
 from datetime import datetime
 
-from app.database.models import User, Board, Task, TimeTracking, Report, StatusEnum, PriorityEnum
+from app.database.models import User, Board, Task, TimeEntry, Report, StatusEnum, PriorityEnum
 
 # ====================
 # USER REPOSITORY
