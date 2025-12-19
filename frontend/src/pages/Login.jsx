@@ -1,7 +1,7 @@
 import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import "../styles/login.css";
 import authService from "../services/authService";
-import { useNavigate } from "react-router-dom";
 
 export default function Login() {
   const [username, setUsername] = useState("");
@@ -43,10 +43,12 @@ export default function Login() {
 
           <button type="submit">Login</button>
         </form>
+
+        <p className="login-footer">
+          Chưa có tài khoản?{" "}
+          <Link to="/register">Register</Link>
+        </p>
       </div>
     </div>
-    <p>
-        Chưa có tài khoản? <Link to="/register">Register</Link>
-    </p>
   );
 }
