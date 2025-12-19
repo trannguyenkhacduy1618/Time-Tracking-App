@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import Stopwatch from "../components/Stopwatch";
 import TaskCard from "../components/TaskCard";
 import ReportTable from "../components/ReportTable";
-import Statistics from "./Statistics";
+import Statistics from "../components/Statistics";
 import axios from "axios";
 
 const Dashboard = () => {
