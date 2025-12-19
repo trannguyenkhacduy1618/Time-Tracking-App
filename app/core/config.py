@@ -7,7 +7,7 @@ class Settings(BaseSettings):
 
     SECRET_KEY: str = "CHANGE_ME"
     ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24
+    access_token_expire_minutes: int = 60 * 24
 
     DATABASE_URL: str = "postgresql://time_tracker_db_z4ui_user:EswQOcmV6hUQesZu19wEOWfZtIXp5A2A@dpg-d4vnfh6mcj7s73dqj6fg-a/time_tracker_db_z4ui"
 
