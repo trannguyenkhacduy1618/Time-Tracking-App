@@ -2,7 +2,7 @@ from pydantic import BaseSettings, PostgresDsn
 
 class Settings(BaseSettings):
     # Database
-    DATABASE_URL: postgresql://time_tracker_db_z4ui_user:EswQOcmV6hUQesZu19wEOWfZtIXp5A2A@dpg-d4vnfh6mcj7s73dqj6fg-a/time_tracker_db_z4ui
+    DATABASE_URL: PostgresDsn
 
     # JWT
     SECRET_KEY: str
