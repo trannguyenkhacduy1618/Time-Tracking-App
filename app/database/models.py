@@ -31,12 +31,12 @@ class User(Base):
     password_hash = Column(String(255), nullable=False)
     role = Column(String(10), default="user")
     is_active = Column(Boolean, default=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, nullable=False)
+    updated_at = Column(DateTime, nullable=False)
 
     boards = relationship("Board", back_populates="owner")
     tasks = relationship("Task", back_populates="assigned_user")
-    time_entries = relationship("TimeEntry", back_populates="user")
+    time_entries = relationship("TimeTracking", back_populates="user")
 
 # ====================
 # BOARD
@@ -75,21 +75,20 @@ class Task(Base):
 
     board = relationship("Board", back_populates="tasks")
     assigned_user = relationship("User", back_populates="tasks")
-    time_entries = relationship("TimeEntry", back_populates="task")
+    time_entries = relationship("TimeTracking", back_populates="task")
 
 # ====================
-# TIME ENTRY
+# TIME TRACKING
 # ====================
-class TimeEntry(Base):
-    __tablename__ = "time_entries"
+class TimeTracking(Base):
+    __tablename__ = "time_tracking"
 
     id = Column(Integer, primary_key=True, index=True)
     task_id = Column(Integer, ForeignKey("tasks.id"))
     user_id = Column(Integer, ForeignKey("users.id"))
-    started_at = Column(DateTime, nullable=False)
-    stopped_at = Column(DateTime, nullable=True)  # None nếu đang chạy
-    duration_seconds = Column(Integer, nullable=True)  # tổng số giây
-    note = Column(Text, nullable=True)
+    start_time = Column(DateTime, nullable=False)
+    end_time = Column(DateTime, nullable=True)  # None nếu đang chạy
+    duration_seconds = Column(Integer, nullable=True)  # total seconds
 
     task = relationship("Task", back_populates="time_entries")
     user = relationship("User", back_populates="time_entries")
