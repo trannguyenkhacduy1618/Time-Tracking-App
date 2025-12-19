@@ -4,17 +4,26 @@ import TaskCard from "../components/TaskCard";
 import ReportTable from "../components/ReportTable";
 import Statistics from "../components/Statistics";
 import axios from "axios";
+import "./Dashboard.css";
+
+// Section wrapper với scroll nếu nội dung dài
+const Section = ({ title, children }) => (
+  <div className="dashboard-section">
+  <h2 className="section-title">{title}</h2>
+  <div className="section-content">{children}</div>
+  </div>
+);
 
 const Dashboard = () => {
   const [tasks, setTasks] = useState([]);
   const [reports, setReports] = useState([]);
   const [selectedTaskId, setSelectedTaskId] = useState(null);
 
-  // Lấy danh sách tasks
+  // Fetch tasks
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        const res = await axios.get("/api/tasks/my/assigned"); // API của backend
+        const res = await axios.get("/api/tasks/my/assigned");
         setTasks(res.data);
       } catch (error) {
         console.error("Error fetching tasks:", error);
@@ -23,11 +32,11 @@ const Dashboard = () => {
     fetchTasks();
   }, []);
 
-  // Lấy báo cáo
+  // Fetch reports
   useEffect(() => {
     const fetchReports = async () => {
       try {
-        const res = await axios.get("/api/reports/daily"); // API backend trả về báo cáo
+        const res = await axios.get("/api/reports/daily");
         setReports(res.data);
       } catch (error) {
         console.error("Error fetching reports:", error);
@@ -38,35 +47,38 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard-container">
-      <h1>Dashboard</h1>
+    <h1 className="dashboard-title">Dashboard</h1>
+    <div className="dashboard-grid-advanced">
+    {/* Column Left */}
+    <div className="dashboard-column">
+    <Section title="Stopwatch">
+    <Stopwatch taskId={selectedTaskId} />
+    </Section>
 
-      <section className="stopwatch-section">
-        <h2>Stopwatch</h2>
-        <Stopwatch taskId={selectedTaskId} />
-      </section>
+    <Section title="My Tasks">
+    <div className="task-list">
+    {tasks.map((task) => (
+      <TaskCard
+      key={task.id}
+      task={task}
+      onSelect={() => setSelectedTaskId(task.id)}
+      />
+    ))}
+    </div>
+    </Section>
+    </div>
 
-      <section className="tasks-section">
-        <h2>My Tasks</h2>
-        <div className="task-cards">
-          {tasks.map((task) => (
-            <TaskCard
-              key={task.id}
-              task={task}
-              onSelect={() => setSelectedTaskId(task.id)}
-            />
-          ))}
-        </div>
-      </section>
+    {/* Column Right */}
+    <div className="dashboard-column">
+    <Section title="Daily Reports">
+    <ReportTable reports={reports} />
+    </Section>
 
-      <section className="reports-section">
-        <h2>Daily Reports</h2>
-        <ReportTable reports={reports} />
-      </section>
-
-      <section className="statistics-section">
-        <h2>Statistics</h2>
-        <Statistics reports={reports} />
-      </section>
+    <Section title="Statistics">
+    <Statistics reports={reports} />
+    </Section>
+    </div>
+    </div>
     </div>
   );
 };
