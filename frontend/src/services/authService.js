@@ -1,5 +1,5 @@
 // frontend/src/services/authService.js
-import api from "../api";
+import api from "./api";
 
 const USER_KEY = "current_user";
 const TOKEN_KEY = import.meta.env.VITE_AUTH_TOKEN_KEY || "access_token";
