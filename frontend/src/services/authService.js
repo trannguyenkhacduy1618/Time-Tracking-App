@@ -1,7 +1,5 @@
 import api from "./api";
-import axios from "axios";
 const USER_KEY = "current_user";
-const API_URL = "https://time-tracking-app-1-uxet.onrender.com";
 const TOKEN_KEY = import.meta.env.VITE_AUTH_TOKEN_KEY;
 
 /**
