@@ -5,24 +5,14 @@ from typing import List
 class Settings(BaseSettings):
     PROJECT_NAME: str = "Time Tracking Backend"
 
-    # Security
     SECRET_KEY: str = "CHANGE_ME"
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24
 
-    # Database
-    DATABASE_URL: str
+    DATABASE_URL: str = "postgresql://time_tracker_db_z4ui_user:EswQOcmV6hUQesZu19wEOWfZtIXp5A2A@dpg-d4vnfh6mcj7s73dqj6fg-a/time_tracker_db_z4ui"
 
-    # CORS
     BACKEND_CORS_ORIGINS: List[str] = ["*"]
-
-    # Extra fields from .env
-    APP_ENV: str = "development"
-    DEBUG: bool = True
-    PORT: int = 8000
 
     class Config:
         env_file = ".env"
-
-
 settings = Settings()
