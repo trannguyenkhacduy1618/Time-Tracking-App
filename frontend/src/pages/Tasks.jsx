@@ -1,70 +1,34 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
-import TaskCard from "../components/TaskCard";
-import "../styles/task.css";
+import { useEffect, useState } from "react";
+import taskService from "../services/taskService";
 
 const Tasks = ({ onSelectTask }) => {
   const [tasks, setTasks] = useState([]);
-  const [statusFilter, setStatusFilter] = useState("");
-  const [priorityFilter, setPriorityFilter] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  // Lấy danh sách tasks
   useEffect(() => {
     const fetchTasks = async () => {
+      setLoading(true);
       try {
-        let url = "/api/tasks/my/assigned";
-        const params = {};
-        if (statusFilter) params.status = statusFilter;
-        if (priorityFilter) params.priority = priorityFilter;
-
-        const res = await axios.get(url, { params });
-        setTasks(res.data);
+        const data = await taskService.getMyAssignedTasks();
+        setTasks(data);
       } catch (error) {
-        console.error("Error fetching tasks:", error);
+        console.error(error);
+        setTasks([]);
+      } finally {
+        setLoading(false);
       }
     };
-
     fetchTasks();
-  }, [statusFilter, priorityFilter]);
+  }, []);
+
+  if (loading) return <p>Loading tasks...</p>;
+  if (!tasks.length) return <p>No tasks assigned</p>;
 
   return (
-    <div className="tasks-page">
-      <h1>Tasks</h1>
-
-      <div className="filters">
-        <select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-        >
-          <option value="">All Status</option>
-          <option value="todo">To Do</option>
-          <option value="in_progress">In Progress</option>
-          <option value="done">Done</option>
-        </select>
-
-        <select
-          value={priorityFilter}
-          onChange={(e) => setPriorityFilter(e.target.value)}
-        >
-          <option value="">All Priority</option>
-          <option value="low">Low</option>
-          <option value="medium">Medium</option>
-          <option value="high">High</option>
-        </select>
-      </div>
-
-      <div className="task-list">
-        {tasks.length === 0 && <p>No tasks found</p>}
-        {tasks.map((task) => (
-          <TaskCard
-            key={task.id}
-            task={task}
-            onSelect={() => onSelectTask(task.id)}
-          />
-        ))}
-      </div>
+    <div className="task-list">
+    {tasks.map((task) => (
+      <TaskCard key={task.id} task={task} onSelect={() => onSelectTask(task.id)} />
+    ))}
     </div>
   );
 };
-
-export default Tasks;
