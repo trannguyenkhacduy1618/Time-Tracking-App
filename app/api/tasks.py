@@ -1,6 +1,8 @@
 from fastapi import APIRouter, HTTPException, status, Query, Depends
 from sqlalchemy.orm import Session
 from typing import List, Optional
+from app.database.connection import get_db
+from app.database import board_repository, task_repository
 
 from app.schemas.task import (
     TaskCreate,
