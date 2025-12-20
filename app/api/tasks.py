@@ -18,7 +18,7 @@ from app.database import (
     user_repository
 )
 from app.database.models import User, StatusEnum
-from app.core.deps import get_current_user
+from app.core.deps import get_current_user, optional_current_user
 
 router = APIRouter(prefix="/tasks", tags=["tasks"])
 
