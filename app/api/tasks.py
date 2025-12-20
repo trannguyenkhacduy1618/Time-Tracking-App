@@ -10,12 +10,13 @@ from app.schemas.task import (
     TaskAssign
 )
 from app.database import (
+    get_db,
     task_repository,
     board_repository,
     user_repository
 )
 from app.database.models import User, StatusEnum
-from app.core.deps import get_db, get_current_user
+from app.core.deps import get_current_user
 
 router = APIRouter(prefix="/tasks", tags=["tasks"])
 
@@ -111,11 +112,12 @@ def get_tasks(
 )
 def create_task(
     task_data: TaskCreate,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(optional_current_user),
     db: Session = Depends(get_db)
 ):
     """
-    Tạo task mới (task sẽ là đơn vị theo dõi thời gian)
+    Tạo task mới
+    (task sẽ là đơn vị theo dõi thời gian)
     """
     if not check_board_access(
         db,
@@ -156,7 +158,8 @@ def get_task(
     db: Session = Depends(get_db)
 ):
     """
-    Lấy chi tiết task (frontend sẽ dùng để hiển thị stopwatch)
+    Lấy chi tiết task
+    (frontend sẽ dùng để hiển thị stopwatch)
     """
     task = task_repository.get(db, task_id)
     if not task:
@@ -274,7 +277,8 @@ def assign_task(
     db: Session = Depends(get_db)
 ):
     """
-    Gán task cho user (ai được assign sẽ là người bấm giờ)
+    Gán task cho user
+    (ai được assign sẽ là người bấm giờ)
     """
     task = task_repository.get(db, task_id)
     if not task:
@@ -325,7 +329,8 @@ def delete_task(
     db: Session = Depends(get_db)
 ):
     """
-    Xóa task (time entries sẽ bị xóa bằng cascade)
+    Xóa task
+    (time entries sẽ bị xóa bằng cascade)
     """
     task = task_repository.get(db, task_id)
     if not task:
@@ -363,7 +368,8 @@ def get_my_assigned_tasks(
     db: Session = Depends(get_db)
 ):
     """
-    Tasks được assign cho user hiện tại (dashboard + thống kê thời gian)
+    Tasks được assign cho user hiện tại
+    (dashboard + thống kê thời gian)
     """
     if current_user.role == "admin":
         tasks = task_repository.get_multi(db)
