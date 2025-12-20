@@ -1,5 +1,5 @@
-from sqlalchemy.orm import Session
 from typing import List, Optional
+from sqlalchemy.orm import Session
 from app.database.models import Task, StatusEnum
 
 class TaskRepository:
@@ -32,16 +32,11 @@ class TaskRepository:
         db.refresh(db_obj)
         return db_obj
 
-    def delete(self, db: Session, id: int):
-        db.query(Task).filter(Task.id == id).delete()
-        db.commit()
-
     def move_task(self, db: Session, task_id: int, new_status: StatusEnum, new_position: Optional[int] = None) -> Task:
         task = self.get(db, task_id)
         if not task:
             return None
 
-        # Nếu status thay đổi, lấy số lượng tasks hiện tại của status mới
         if task.status != new_status:
             task.status = new_status
             tasks_in_new_status = db.query(Task).filter(Task.board_id == task.board_id, Task.status == new_status).order_by(Task.position).all()
@@ -54,6 +49,9 @@ class TaskRepository:
         db.refresh(task)
         return task
 
+    def delete(self, db: Session, id: int):
+        db.query(Task).filter(Task.id == id).delete()
+        db.commit()
 
-# Singleton instance
+
 task_repository = TaskRepository()
