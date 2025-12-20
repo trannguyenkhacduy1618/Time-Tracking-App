@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import taskService from "../services/taskService";
+import TaskCard from "../components/TaskCard"; // nhớ import TaskCard
+import "../styles/task.css"; // nếu có CSS riêng
 
 const Tasks = ({ onSelectTask }) => {
   const [tasks, setTasks] = useState([]);
@@ -27,8 +29,14 @@ const Tasks = ({ onSelectTask }) => {
   return (
     <div className="task-list">
     {tasks.map((task) => (
-      <TaskCard key={task.id} task={task} onSelect={() => onSelectTask(task.id)} />
+      <TaskCard
+      key={task.id}
+      task={task}
+      onSelect={() => onSelectTask(task.id)}
+      />
     ))}
     </div>
   );
 };
+
+export default Tasks; // ✅ Thêm dòng này để dùng default import
