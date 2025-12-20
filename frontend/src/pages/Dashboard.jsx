@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
+
 import Stopwatch from "../components/Stopwatch";
 import TaskCard from "../components/TaskCard";
 import BoardCard from "../components/BoardCard";
 import ReportTable from "../components/ReportTable";
 import Statistics from "../components/Statistics";
+import BoardModal from "../components/BoardModal";
 
 import taskService from "../services/taskService";
 import boardService from "../services/boardService";
@@ -12,91 +14,81 @@ import reportService from "../services/reportService";
 import "../styles/dashboard.css";
 
 const Dashboard = () => {
-  const [tasks, setTasks] = useState([]);
   const [boards, setBoards] = useState([]);
+  const [tasks, setTasks] = useState([]);
   const [reports, setReports] = useState([]);
+
   const [selectedTaskId, setSelectedTaskId] = useState(null);
 
   const [loading, setLoading] = useState({
-    tasks: true,
     boards: true,
+    tasks: true,
     reports: true,
   });
 
-  // ---------------- Fetch data ----------------
-  const fetchTasks = async () => {
-    setLoading((prev) => ({ ...prev, tasks: true }));
-    try {
-      const data = await taskService.getMyAssignedTasks();
-      setTasks(data);
-    } catch (err) {
-      console.error("Error fetching tasks:", err);
-      setTasks([]);
-    } finally {
-      setLoading((prev) => ({ ...prev, tasks: false }));
-    }
-  };
+  const [showBoardModal, setShowBoardModal] = useState(false);
+  const [editingBoard, setEditingBoard] = useState(null);
 
+  // ---------------- Fetch ----------------
   const fetchBoards = async () => {
-    setLoading((prev) => ({ ...prev, boards: true }));
+    setLoading((p) => ({ ...p, boards: true }));
     try {
       const data = await boardService.getBoards();
       setBoards(data);
-    } catch (err) {
-      console.error("Error fetching boards:", err);
+    } catch {
       setBoards([]);
     } finally {
-      setLoading((prev) => ({ ...prev, boards: false }));
+      setLoading((p) => ({ ...p, boards: false }));
+    }
+  };
+
+  const fetchTasks = async () => {
+    setLoading((p) => ({ ...p, tasks: true }));
+    try {
+      const data = await taskService.getMyAssignedTasks();
+      setTasks(data);
+    } catch {
+      setTasks([]);
+    } finally {
+      setLoading((p) => ({ ...p, tasks: false }));
     }
   };
 
   const fetchReports = async () => {
-    setLoading((prev) => ({ ...prev, reports: true }));
+    setLoading((p) => ({ ...p, reports: true }));
     try {
       const data = await reportService.getDailyReport();
       setReports(data);
-    } catch (err) {
-      console.error("Error fetching reports:", err);
+    } catch {
       setReports([]);
     } finally {
-      setLoading((prev) => ({ ...prev, reports: false }));
+      setLoading((p) => ({ ...p, reports: false }));
     }
   };
 
   useEffect(() => {
-    fetchTasks();
     fetchBoards();
+    fetchTasks();
     fetchReports();
   }, []);
 
-  // ---------------- CRUD Handlers ----------------
-  const addTask = async (taskData) => {
-    await taskService.createTask(taskData);
-    fetchTasks();
-  };
-
-  const updateTask = async (taskId, data) => {
-    await taskService.updateTask(taskId, data);
-    fetchTasks();
-  };
-
-  const deleteTask = async (taskId) => {
-    await taskService.deleteTask(taskId);
-    fetchTasks();
-  };
-
-  const addBoard = async (boardData) => {
-    await boardService.createBoard(boardData);
+  // ---------------- Board handlers ----------------
+  const handleCreateBoard = async (data) => {
+    await boardService.createBoard(data);
+    setShowBoardModal(false);
     fetchBoards();
   };
 
-  const updateBoard = async (boardId, data) => {
-    await boardService.updateBoard(boardId, data);
+  const handleUpdateBoard = async (id, data) => {
+    await boardService.updateBoard(id, data);
+    setShowBoardModal(false);
+    setEditingBoard(null);
     fetchBoards();
   };
 
-  const deleteBoard = async (boardId) => {
-    await boardService.deleteBoard(boardId);
+  const handleDeleteBoard = async (id) => {
+    if (!window.confirm("Delete this board?")) return;
+    await boardService.deleteBoard(id);
     fetchBoards();
   };
 
@@ -105,42 +97,53 @@ const Dashboard = () => {
     <h1>Dashboard</h1>
 
     {/* Stopwatch */}
-    <section className="stopwatch-section">
+    <section>
     <h2>Stopwatch</h2>
     <Stopwatch taskId={selectedTaskId} onStop={fetchTasks} />
     </section>
 
     {/* Boards */}
-    <section className="boards-section">
+    <section>
+    <div className="section-header">
     <h2>Boards</h2>
+    <button
+    onClick={() => {
+      setEditingBoard(null);
+      setShowBoardModal(true);
+    }}
+    >
+    + Add Board
+    </button>
+    </div>
+
     {loading.boards ? (
       <p>Loading boards...</p>
     ) : boards.length === 0 ? (
-      <p>No boards available</p>
+      <p>No boards</p>
     ) : (
       <div className="board-cards">
       {boards.map((board) => (
         <BoardCard
         key={board.id}
         board={board}
-        onUpdate={(data) => updateBoard(board.id, data)}
-        onDelete={() => deleteBoard(board.id)}
+        onUpdate={() => {
+          setEditingBoard(board);
+          setShowBoardModal(true);
+        }}
+        onDelete={() => handleDeleteBoard(board.id)}
         />
       ))}
       </div>
     )}
-    <button onClick={() => addBoard({ name: "New Board" })}>
-    Add Board
-    </button>
     </section>
 
     {/* Tasks */}
-    <section className="tasks-section">
+    <section>
     <h2>My Tasks</h2>
     {loading.tasks ? (
       <p>Loading tasks...</p>
     ) : tasks.length === 0 ? (
-      <p>No tasks assigned to you</p>
+      <p>No tasks assigned</p>
     ) : (
       <div className="task-cards">
       {tasks.map((task) => (
@@ -148,32 +151,42 @@ const Dashboard = () => {
         key={task.id}
         task={task}
         onSelect={() => setSelectedTaskId(task.id)}
-        onUpdate={(data) => updateTask(task.id, data)}
-        onDelete={() => deleteTask(task.id)}
         />
       ))}
       </div>
     )}
-    <button onClick={() => addTask({ title: "New Task" })}>Add Task</button>
     </section>
 
-    {/* Daily Reports */}
-    <section className="reports-section">
+    {/* Reports */}
+    <section>
     <h2>Daily Reports</h2>
     {loading.reports ? (
       <p>Loading reports...</p>
-    ) : reports.length === 0 ? (
-      <p>No reports found</p>
     ) : (
       <ReportTable data={reports} />
     )}
     </section>
 
     {/* Statistics */}
-    <section className="statistics-section">
+    <section>
     <h2>Statistics</h2>
     <Statistics reports={reports} />
     </section>
+
+    {/* Board Modal */}
+    <BoardModal
+    open={showBoardModal}
+    initialData={editingBoard}
+    onClose={() => {
+      setShowBoardModal(false);
+      setEditingBoard(null);
+    }}
+    onSubmit={(data) =>
+      editingBoard
+      ? handleUpdateBoard(editingBoard.id, data)
+      : handleCreateBoard(data)
+    }
+    />
     </div>
   );
 };
