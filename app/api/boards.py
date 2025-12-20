@@ -10,12 +10,12 @@ from app.schemas.board import (
 )
 from app.schemas.task import TaskResponse
 from app.database import (
+    get_db,
     board_repository,
     task_repository
 )
 from app.database.models import User
 from app.core.deps import (
-    get_db,
     get_current_user,
     optional_current_user
 )
@@ -112,11 +112,12 @@ def get_public_boards(
 )
 def create_board(
     board_data: BoardCreate,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(optional_current_user),
     db: Session = Depends(get_db)
 ):
     """
-    Tạo board mới (Project mới để theo dõi thời gian)
+    Tạo board mới
+    (Project mới để theo dõi thời gian)
     """
     board_dict = board_data.dict()
     board_dict["owner_id"] = current_user.id
@@ -143,7 +144,8 @@ def get_board_detail(
     db: Session = Depends(get_db)
 ):
     """
-    Chi tiết board + tasks (chuẩn bị cho báo cáo theo project)
+    Chi tiết board + tasks
+    (chuẩn bị cho báo cáo theo project)
     """
     board = board_repository.get(db, board_id)
     if not board:
