@@ -20,3 +20,9 @@ export const deleteBoard = async (boardId) => {
     const response = await api.delete(`/boards/${boardId}`);
     return response.data;
 };
+export default {
+    getBoards,
+    createBoard,
+    updateBoard,
+    deleteBoard,
+};
