@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import Stopwatch from "../components/Stopwatch";
 import TaskCard from "../components/TaskCard";
+import BoardCard from "../components/BoardCard";
 import ReportTable from "../components/ReportTable";
 import Statistics from "../components/Statistics";
-import BoardCard from "../components/BoardCard";
 
 import taskService from "../services/taskService";
-import reportService from "../services/reportService";
 import boardService from "../services/boardService";
+import reportService from "../services/reportService";
 
 import "../styles/dashboard.css";
 
@@ -16,6 +16,7 @@ const Dashboard = () => {
   const [boards, setBoards] = useState([]);
   const [reports, setReports] = useState([]);
   const [selectedTaskId, setSelectedTaskId] = useState(null);
+
   const [loading, setLoading] = useState({
     tasks: true,
     boards: true,
@@ -30,6 +31,7 @@ const Dashboard = () => {
       setTasks(data);
     } catch (err) {
       console.error("Error fetching tasks:", err);
+      setTasks([]);
     } finally {
       setLoading((prev) => ({ ...prev, tasks: false }));
     }
@@ -42,6 +44,7 @@ const Dashboard = () => {
       setBoards(data);
     } catch (err) {
       console.error("Error fetching boards:", err);
+      setBoards([]);
     } finally {
       setLoading((prev) => ({ ...prev, boards: false }));
     }
@@ -54,6 +57,7 @@ const Dashboard = () => {
       setReports(data);
     } catch (err) {
       console.error("Error fetching reports:", err);
+      setReports([]);
     } finally {
       setLoading((prev) => ({ ...prev, reports: false }));
     }
@@ -125,7 +129,9 @@ const Dashboard = () => {
       ))}
       </div>
     )}
-    <button onClick={() => addBoard({ name: "New Board" })}>Add Board</button>
+    <button onClick={() => addBoard({ name: "New Board" })}>
+    Add Board
+    </button>
     </section>
 
     {/* Tasks */}
