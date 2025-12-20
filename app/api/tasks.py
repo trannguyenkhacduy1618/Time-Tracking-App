@@ -112,9 +112,11 @@ def get_tasks(
     response_model=TaskResponse,
     status_code=status.HTTP_201_CREATED
 )
+from app.core.deps import get_current_user
+
 def create_task(
     task_data: TaskCreate,
-    current_user: User = Depends(optional_current_user),
+    current_user: User = Depends(get_current_user),  # bắt buộc login
     db: Session = Depends(get_db)
 ):
     """
