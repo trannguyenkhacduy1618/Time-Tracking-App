@@ -112,44 +112,30 @@ def get_tasks(
     response_model=TaskResponse,
     status_code=status.HTTP_201_CREATED
 )
-from app.core.deps import get_current_user
 
 def create_task(
     task_data: TaskCreate,
-    current_user: User = Depends(get_current_user),  # bắt buộc login
+    current_user: User = Depends(optional_current_user),
     db: Session = Depends(get_db)
 ):
     """
     Tạo task mới
     (task sẽ là đơn vị theo dõi thời gian)
     """
-    if not check_board_access(
-        db,
-        task_data.board_id,
-        current_user,
-        "write"
-    ):
+    if not check_board_access(db, task_data.board_id, current_user, "write"):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Không có quyền tạo task"
         )
 
-    existing = task_repository.get_by_status(
-        db,
-        task_data.board_id,
-        task_data.status
-    )
+    existing = task_repository.get_by_status(db, task_data.board_id, task_data.status)
 
     task_dict = task_data.dict()
     task_dict["position"] = len(existing)
 
-    task = task_repository.create(
-        db,
-        obj_in=task_dict
-    )
+    task = task_repository.create(db, obj_in=task_dict)
 
     return TaskResponse.from_orm(task)
-
 
 # =========================
 # Task detail
