@@ -1,6 +1,6 @@
-from sqlalchemy.orm import Session
 from typing import List, Optional
 from datetime import datetime
+from sqlalchemy.orm import Session
 from app.database.models import TimeEntry
 
 class TimeEntryRepository:
@@ -40,5 +40,4 @@ class TimeEntryRepository:
         db.commit()
 
 
-# Singleton instance
 time_entry_repository = TimeEntryRepository()
