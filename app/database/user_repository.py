@@ -1,7 +1,7 @@
-from sqlalchemy.orm import Session
 from typing import List, Optional
-from app.core.security import get_password_hash
+from sqlalchemy.orm import Session
 from app.database.models import User
+from app.core.security import get_password_hash
 
 class UserRepository:
     def get(self, db: Session, user_id: int) -> Optional[User]:
@@ -16,8 +16,9 @@ class UserRepository:
     def get_multi(self, db: Session, skip: int = 0, limit: int = 100) -> List[User]:
         return db.query(User).offset(skip).limit(limit).all()
 
-    def create_user(self, db: Session, obj_in: dict) -> User:
-        user = User(**obj_in)
+    def create_user(self, db: Session, user_dict: dict) -> User:
+        user_dict["password_hash"] = get_password_hash(user_dict.pop("password"))
+        user = User(**user_dict)
         db.add(user)
         db.commit()
         db.refresh(user)
@@ -30,7 +31,7 @@ class UserRepository:
         db.refresh(db_obj)
         return db_obj
 
-    def update_password(self, db: Session, user: User, new_password: str):
+    def update_password(self, db: Session, user: User, new_password: str) -> User:
         user.password_hash = get_password_hash(new_password)
         db.commit()
         db.refresh(user)
