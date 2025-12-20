@@ -29,3 +29,4 @@ const Reports = () => {
 
   return <ReportTable data={daily} />;
 };
+export default Reports;
