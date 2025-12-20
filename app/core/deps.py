@@ -1,29 +1,14 @@
+# app/core/deps.py
 from typing import Generator, Optional
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 
-from app.database.connection import get_db
+from app.database.connection import get_db  # <-- import đúng
 from app.database.models import User
 from app.database.user_repository import UserRepository
-from app.core.security import verify_password
 
-# OAuth2 scheme dùng cho token-based auth
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
-
-
-def get_db() -> Generator[Session, None, None]:
-    """
-    Dependency tạo session DB.
-    Dùng trong route với: db: Session = Depends(get_db)
-    """
-    db_session = None
-    try:
-        db_session = next(get_db())
-        yield db_session
-    finally:
-        if db_session:
-            db_session.close()
 
 
 def get_current_user(
@@ -95,5 +80,5 @@ def require_role(
     return current_user
 
 
-# Nếu cần có các dependency khác trong tương lai,
-# chỉ cần thêm ở đây để reuse trong các router.
+# --- Aliases để tương thích với import cũ ---
+get_current_admin_user = require_admin
