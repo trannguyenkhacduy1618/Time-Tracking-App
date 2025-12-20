@@ -5,93 +5,94 @@ import ReportTable from "../components/ReportTable";
 import Statistics from "../components/Statistics";
 import BoardCard from "../components/BoardCard";
 
-import { getMyTasks, createTask, updateTask, deleteTask } from "../services/taskService";
-import { getDailyReport } from "../services/reportService";
-import { getBoards, createBoard, updateBoard, deleteBoard } from "../services/boardService";
+import taskService from "../services/taskService";
+import reportService from "../services/reportService";
+import boardService from "../services/boardService";
 
 import "../styles/dashboard.css";
 
 const Dashboard = () => {
   const [tasks, setTasks] = useState([]);
-  const [reports, setReports] = useState([]);
   const [boards, setBoards] = useState([]);
+  const [reports, setReports] = useState([]);
   const [selectedTaskId, setSelectedTaskId] = useState(null);
-
-  const [loadingTasks, setLoadingTasks] = useState(true);
-  const [loadingReports, setLoadingReports] = useState(true);
-  const [loadingBoards, setLoadingBoards] = useState(true);
+  const [loading, setLoading] = useState({
+    tasks: true,
+    boards: true,
+    reports: true,
+  });
 
   // ---------------- Fetch data ----------------
   const fetchTasks = async () => {
-    setLoadingTasks(true);
+    setLoading((prev) => ({ ...prev, tasks: true }));
     try {
-      const res = await getMyTasks();
-      setTasks(res.data);
+      const data = await taskService.getMyAssignedTasks();
+      setTasks(data);
     } catch (err) {
       console.error("Error fetching tasks:", err);
     } finally {
-      setLoadingTasks(false);
-    }
-  };
-
-  const fetchReports = async () => {
-    setLoadingReports(true);
-    try {
-      const res = await getDailyReport();
-      setReports(res.data);
-    } catch (err) {
-      console.error("Error fetching reports:", err);
-    } finally {
-      setLoadingReports(false);
+      setLoading((prev) => ({ ...prev, tasks: false }));
     }
   };
 
   const fetchBoards = async () => {
-    setLoadingBoards(true);
+    setLoading((prev) => ({ ...prev, boards: true }));
     try {
-      const res = await getBoards();
-      setBoards(res.data);
+      const data = await boardService.getBoards();
+      setBoards(data);
     } catch (err) {
       console.error("Error fetching boards:", err);
     } finally {
-      setLoadingBoards(false);
+      setLoading((prev) => ({ ...prev, boards: false }));
+    }
+  };
+
+  const fetchReports = async () => {
+    setLoading((prev) => ({ ...prev, reports: true }));
+    try {
+      const data = await reportService.getDailyReport();
+      setReports(data);
+    } catch (err) {
+      console.error("Error fetching reports:", err);
+    } finally {
+      setLoading((prev) => ({ ...prev, reports: false }));
     }
   };
 
   useEffect(() => {
     fetchTasks();
-    fetchReports();
     fetchBoards();
+    fetchReports();
   }, []);
 
-  // ---------------- CRUD handlers ----------------
-  const handleAddTask = async (taskData) => {
-    await createTask(taskData);
+  // ---------------- CRUD Handlers ----------------
+  const addTask = async (taskData) => {
+    await taskService.createTask(taskData);
     fetchTasks();
   };
 
-  const handleUpdateTask = async (taskId, data) => {
-    await updateTask(taskId, data);
+  const updateTask = async (taskId, data) => {
+    await taskService.updateTask(taskId, data);
     fetchTasks();
   };
 
-  const handleDeleteTask = async (taskId) => {
-    await deleteTask(taskId);
+  const deleteTask = async (taskId) => {
+    await taskService.deleteTask(taskId);
     fetchTasks();
   };
 
-  const handleAddBoard = async (boardData) => {
-    await createBoard(boardData);
+  const addBoard = async (boardData) => {
+    await boardService.createBoard(boardData);
     fetchBoards();
   };
 
-  const handleUpdateBoard = async (boardId, data) => {
-    await updateBoard(boardId, data);
+  const updateBoard = async (boardId, data) => {
+    await boardService.updateBoard(boardId, data);
     fetchBoards();
   };
 
-  const handleDeleteBoard = async (boardId) => {
-    await deleteBoard(boardId);
+  const deleteBoard = async (boardId) => {
+    await boardService.deleteBoard(boardId);
     fetchBoards();
   };
 
@@ -99,14 +100,16 @@ const Dashboard = () => {
     <div className="dashboard-container">
     <h1>Dashboard</h1>
 
+    {/* Stopwatch */}
     <section className="stopwatch-section">
     <h2>Stopwatch</h2>
-    <Stopwatch taskId={selectedTaskId} />
+    <Stopwatch taskId={selectedTaskId} onStop={fetchTasks} />
     </section>
 
+    {/* Boards */}
     <section className="boards-section">
     <h2>Boards</h2>
-    {loadingBoards ? (
+    {loading.boards ? (
       <p>Loading boards...</p>
     ) : boards.length === 0 ? (
       <p>No boards available</p>
@@ -116,18 +119,19 @@ const Dashboard = () => {
         <BoardCard
         key={board.id}
         board={board}
-        onUpdate={(data) => handleUpdateBoard(board.id, data)}
-        onDelete={() => handleDeleteBoard(board.id)}
+        onUpdate={(data) => updateBoard(board.id, data)}
+        onDelete={() => deleteBoard(board.id)}
         />
       ))}
       </div>
     )}
-    <button onClick={() => handleAddBoard({ name: "New Board" })}>Add Board</button>
+    <button onClick={() => addBoard({ name: "New Board" })}>Add Board</button>
     </section>
 
+    {/* Tasks */}
     <section className="tasks-section">
     <h2>My Tasks</h2>
-    {loadingTasks ? (
+    {loading.tasks ? (
       <p>Loading tasks...</p>
     ) : tasks.length === 0 ? (
       <p>No tasks assigned to you</p>
@@ -138,26 +142,28 @@ const Dashboard = () => {
         key={task.id}
         task={task}
         onSelect={() => setSelectedTaskId(task.id)}
-        onUpdate={(data) => handleUpdateTask(task.id, data)}
-        onDelete={() => handleDeleteTask(task.id)}
+        onUpdate={(data) => updateTask(task.id, data)}
+        onDelete={() => deleteTask(task.id)}
         />
       ))}
       </div>
     )}
-    <button onClick={() => handleAddTask({ title: "New Task" })}>Add Task</button>
+    <button onClick={() => addTask({ title: "New Task" })}>Add Task</button>
     </section>
 
+    {/* Daily Reports */}
     <section className="reports-section">
     <h2>Daily Reports</h2>
-    {loadingReports ? (
+    {loading.reports ? (
       <p>Loading reports...</p>
     ) : reports.length === 0 ? (
       <p>No reports found</p>
     ) : (
-      <ReportTable reports={reports} />
+      <ReportTable data={reports} />
     )}
     </section>
 
+    {/* Statistics */}
     <section className="statistics-section">
     <h2>Statistics</h2>
     <Statistics reports={reports} />
