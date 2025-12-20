@@ -1,37 +1,61 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import authService from "../services/authService";
 import "../styles/register.css";
 
 export default function Register() {
-    const navigate = useNavigate();
     const [username, setUsername] = useState("");
+    const [email, setEmail] = useState("");
+    const [fullName, setFullName] = useState("");
     const [password, setPassword] = useState("");
-    const [error, setError] = useState("");
+    const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError("");
 
         try {
-            await authService.register(username, password);
-            alert("Register thành công! Vui lòng login.");
+            await authService.register({
+                username,
+                email,
+                full_name: fullName,
+                password,
+            });
+
+            alert("Đăng ký thành công, mời đăng nhập");
             navigate("/login");
         } catch (err) {
-            setError(err.response?.data?.detail || "Register thất bại");
+            console.error(err.response?.data || err);
+            alert("Register thất bại");
         }
     };
 
     return (
         <div className="register-container">
         <div className="register-card">
-        <h2>Register</h2>
+        <h1>Create account</h1>
 
         <form onSubmit={handleSubmit}>
         <input
+        type="text"
         placeholder="Username"
         value={username}
         onChange={(e) => setUsername(e.target.value)}
+        required
+        />
+
+        <input
+        type="email"
+        placeholder="Email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        required
+        />
+
+        <input
+        type="text"
+        placeholder="Full name"
+        value={fullName}
+        onChange={(e) => setFullName(e.target.value)}
         required
         />
 
@@ -43,14 +67,12 @@ export default function Register() {
         required
         />
 
-        <button type="submit">Create account</button>
+        <button type="submit">Register</button>
         </form>
 
-        {error && <div className="register-error">{error}</div>}
-
-        <div className="register-footer">
+        <p>
         Đã có tài khoản? <Link to="/login">Login</Link>
-        </div>
+        </p>
         </div>
         </div>
     );
