@@ -114,7 +114,7 @@ def get_public_boards(
 )
 def create_board(
     board_data: BoardCreate,
-    current_user: User = Depends(optional_current_user),
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """
